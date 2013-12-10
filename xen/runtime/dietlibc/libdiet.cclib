@@ -12,6 +12,12 @@ lib/errlistu.o
 lib/errno_location.o
 lib/ffs.o
 lib/finite.o
+lib/inet_addr.c
+lib/inet_aton.c
+lib/inet_ntoa.c
+lib/inet_ntoa_r.c
+lib/inet_ntop.c
+lib/inet_pton.c
 lib/isalnum.o
 lib/isalpha.o
 lib/isascii.o
