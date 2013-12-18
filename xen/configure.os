@@ -32,6 +32,7 @@ xen)
     -DSYS_xen -I${PWD}/runtime/ocaml -I${PWD}/runtime/libm \
     -Wextra -Wchar-subscripts -Wno-switch \
     -Wno-unused -Wredundant-decls -D__dietlibc__ -I${PWD}/runtime/dietlibc \
+    -DXEN -I${PWD}/runtime/libsepol/include \
     -DNATIVE_CODE"
   ;;
 *)
