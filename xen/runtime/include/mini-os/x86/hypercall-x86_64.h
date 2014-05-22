@@ -320,6 +320,13 @@ HYPERVISOR_domctl(
 	return _hypercall1(int, domctl, op);
 }
 
+static inline int
+HYPERVISOR_xsm_op(
+  void *op)
+{
+  return _hypercall1(int, xsm_op, op);
+}
+
 #endif /* __HYPERCALL_X86_64_H__ */
 
 /*
