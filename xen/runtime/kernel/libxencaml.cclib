@@ -10,3 +10,4 @@ sched_stubs.o
 start_info_stubs.o
 atomic_stubs.o
 flask_stubs.o
+domctl_stubs.o
