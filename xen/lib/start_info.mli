@@ -31,3 +31,6 @@ val console_start_page: unit -> Io_page.t
 val xenstore_start_page: unit -> Io_page.t
 (** [xenstore_start_page ()] is the xenstore page automatically
     allocated by Xen. *)
+
+val mod_array: unit -> Io_page.t
+(** [mod_array ()] returns the module passed to this kernel. *)

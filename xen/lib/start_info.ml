@@ -20,3 +20,4 @@ type t = {
 external get: unit -> t = "stub_start_info_get"
 external console_start_page: unit -> Io_page.t = "caml_console_start_page"
 external xenstore_start_page: unit -> Io_page.t = "caml_xenstore_start_page"
+external mod_array: unit -> Io_page.t = "caml_mod_array"
