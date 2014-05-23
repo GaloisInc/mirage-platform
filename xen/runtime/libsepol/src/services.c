@@ -1561,7 +1561,11 @@ int hidden next_entry(void *buf, struct policy_file *fp, size_t bytes)
 
 	switch (fp->type) {
 	case PF_USE_STDIO:
+#ifdef XEN
+    nread = -1;
+#else
 		nread = fread(buf, bytes, 1, fp->fp);
+#endif
 
 		if (nread != 1)
 			return -1;
@@ -1586,7 +1590,12 @@ size_t hidden put_entry(const void *ptr, size_t size, size_t n,
 
 	switch (fp->type) {
 	case PF_USE_STDIO:
+#ifdef XEN
+    errno = ENOSYS;
+    return 0;
+#else
 		return fwrite(ptr, size, n, fp->fp);
+#endif
 	case PF_USE_MEMORY:
 		if (bytes > fp->len) {
 			errno = ENOSPC;

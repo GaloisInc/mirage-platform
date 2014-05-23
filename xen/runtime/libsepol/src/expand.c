@@ -83,7 +83,9 @@ static void linear_probe_destroy(struct linear_probe *probe)
 static void linear_probe_insert(struct linear_probe *probe, uint32_t key,
 				filename_trans_t *data)
 {
+#ifndef XEN
 	assert(probe->length > key);
+#endif
 
 	if (probe->table[key] != NULL) {
 		data->next = probe->table[key];
@@ -95,7 +97,9 @@ static void linear_probe_insert(struct linear_probe *probe, uint32_t key,
 
 static filename_trans_t *linear_probe_find(struct linear_probe *probe, uint32_t key)
 {
+#ifndef XEN
 	assert(probe->length > key);
+#endif
 
 	return probe->table[key];
 }
@@ -119,7 +123,9 @@ static filename_trans_t *linear_probe_dump(struct linear_probe *probe,
 	}
 
 	/* Incoherent result and end pointers indicates bug */
+#ifndef XEN
 	assert((result != NULL && end != NULL) || (result == NULL && end == NULL));
+#endif
 
 	*endp = end;
 	return result;
@@ -749,8 +755,10 @@ static int alias_copy_callback(hashtab_key_t key, hashtab_datum_t datum,
 		new_alias->s.value = state->typemap[alias->s.value - 1];
 	else if (alias->flavor == TYPE_ALIAS)
 		new_alias->s.value = state->typemap[alias->primary - 1];
+#ifndef XEN
 	else
 		assert(0);	/* unreachable */
+#endif
 
 	new_alias->flags = alias->flags;
 
@@ -833,7 +841,9 @@ static int role_fix_callback(hashtab_key_t key, hashtab_datum_t datum,
 	new_role =
 		(role_datum_t *)hashtab_search(state->out->p_roles.table, id);
 
+#ifndef XEN
 	assert(new_role != NULL && new_role->flavor == ROLE_ATTRIB);
+#endif
 
 	ebitmap_init(&mapped_roles);
 	if (map_ebitmap(&role->roles, &mapped_roles, state->rolemap))
@@ -853,8 +863,10 @@ static int role_fix_callback(hashtab_key_t key, hashtab_datum_t datum,
 			regular_role = (role_datum_t *)hashtab_search(
 						state->out->p_roles.table,
 						base_reg_role_id);
+#ifndef XEN
 			assert(regular_role != NULL && 
 			       regular_role->flavor == ROLE_ROLE);
+#endif
 
 			if (ebitmap_union(&regular_role->types.types, 
 					  &new_role->types.types)) {
@@ -1767,7 +1779,9 @@ static int expand_terule_helper(sepol_handle_t * handle,
 	} else if (specified & AVRULE_CHANGE) {
 		spec = AVTAB_CHANGE;
 	} else {
+#ifndef XEN
 		assert(0);	/* unreachable */
+#endif
 	}
 
 	cur = perms;
@@ -1846,7 +1860,9 @@ static int expand_terule_helper(sepol_handle_t * handle,
 		} else if (specified & AVRULE_CHANGE) {
 			avdatump->data = remapped_data;
 		} else {
+#ifndef XEN
 			assert(0);	/* should never occur */
+#endif
 		}
 
 		cur = cur->next;
@@ -1881,7 +1897,9 @@ static int expand_avrule_helper(sepol_handle_t * handle,
 	} else if (specified & AVRULE_NEVERALLOW) {
 		spec = AVTAB_NEVERALLOW;
 	} else {
+#ifndef XEN
 		assert(0);	/* unreachable */
+#endif
 	}
 
 	cur = perms;
@@ -1922,7 +1940,9 @@ static int expand_avrule_helper(sepol_handle_t * handle,
 			else
 				avdatump->data = ~cur->data;
 		} else {
+#ifndef XEN
 			assert(0);	/* should never occur */
+#endif
 		}
 
 		cur = cur->next;
@@ -2464,13 +2484,17 @@ int role_set_expand(role_set_t * x, ebitmap_t * r, policydb_t * out, policydb_t 
 	ebitmap_init(&roles);
 	
 	if (rolemap) {
+#ifndef XEN
 		assert(base != NULL);
+#endif
 		ebitmap_for_each_bit(&x->roles, rnode, i) {
 			if (ebitmap_node_get_bit(rnode, i)) {
 				/* take advantage of p_role_val_to_struct[]
 				 * of the base module */
 				role = base->role_val_to_struct[i];
+#ifndef XEN
 				assert(role != NULL);
+#endif
 				if (role->flavor == ROLE_ATTRIB) {
 					if (ebitmap_union(&roles,
 							  &role->roles))
@@ -2604,7 +2628,9 @@ int type_set_expand(type_set_t * set, ebitmap_t * t, policydb_t * p,
 		for (i = 0; i < p->p_types.nprim; i++) {
 			if (p->type_val_to_struct[i] &&
 			    p->type_val_to_struct[i]->flavor == TYPE_ATTRIB) {
+#ifndef XEN
 				assert(!ebitmap_get_bit(t, i));
+#endif
 				continue;
 			}
 			if (ebitmap_get_bit(t, i)) {
@@ -2666,7 +2692,9 @@ static int copy_neverallow(policydb_t * dest_pol, uint32_t * typemap,
 			goto err;
 		class_perm_node_init(new_perm);
 		new_perm->class = cur_perm->class;
+#ifndef XEN
 		assert(new_perm->class);
+#endif
 
 		/* once we have modules with permissions we'll need to map the permissions (and classes) */
 		new_perm->data = cur_perm->data;
@@ -2887,8 +2915,10 @@ static void discard_tunables(sepol_handle_t *sh, policydb_t *pol)
 			 * that no mixture of tunables and booleans in one
 			 * expression. However, this would be broken by the
 			 * request to preserve tunables */
+#ifndef XEN
 			if (!preserve_tunables)
 				assert(!(booleans && tunables));
+#endif
 
 			if (booleans || preserve_tunables) {
 				cur_node->flags &= ~COND_NODE_FLAGS_TUNABLE;
@@ -2900,9 +2930,11 @@ static void discard_tunables(sepol_handle_t *sh, policydb_t *pol)
 				cur_node->flags |= COND_NODE_FLAGS_TUNABLE;
 				cur_state = cond_evaluate_expr(pol, cur_node->expr);
 				if (cur_state == -1) {
+#ifndef XEN
 					printf("Expression result was "
 					       "undefined, skipping all"
 					       "rules\n");
+#endif
 					continue;
 				}
 

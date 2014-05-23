@@ -307,7 +307,9 @@ void hashtab_hash_eval(hashtab_t h, char *tag)
 		}
 	}
 
+#ifndef XEN
 	printf
 	    ("%s:  %d entries and %d/%d buckets used, longest chain length %d\n",
 	     tag, h->nel, slots_used, h->size, max_chain_len);
+#endif
 }

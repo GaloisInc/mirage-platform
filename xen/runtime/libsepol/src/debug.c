@@ -45,7 +45,7 @@ void hidden sepol_msg_default_handler(void *varg __attribute__ ((unused)),
 				      sepol_handle_t * handle,
 				      const char *fmt, ...)
 {
-
+#ifndef XEN
 	FILE *stream = NULL;
 
 	switch (sepol_msg_get_level(handle)) {
@@ -71,6 +71,7 @@ void hidden sepol_msg_default_handler(void *varg __attribute__ ((unused)),
 	fprintf(stream, "\n");
 
 	varg = NULL;
+#endif
 }
 
 extern void sepol_msg_set_callback(sepol_handle_t * handle,

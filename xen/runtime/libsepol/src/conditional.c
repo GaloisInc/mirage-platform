@@ -314,8 +314,10 @@ static int evaluate_cond_node(policydb_t * p, cond_node_t * node)
 	if (new_state != node->cur_state) {
 		node->cur_state = new_state;
 		if (new_state == -1)
+#ifndef XEN
 			printf
 			    ("expression result was undefined - disabling all rules.\n");
+#endif
 		/* turn the rules on or off */
 		for (cur = node->true_list; cur != NULL; cur = cur->next) {
 			if (new_state <= 0) {
@@ -368,8 +370,10 @@ int cond_normalize_expr(policydb_t * p, cond_node_t * cn)
 		if (ne) {
 			ne->next = NULL;
 		} else {	/* ne should never be NULL */
+#ifndef XEN
 			printf
 			    ("Found expr with no bools and only a ! - this should never happen.\n");
+#endif
 			return -1;
 		}
 		/* swap the true and false lists */
@@ -422,9 +426,11 @@ int cond_normalize_expr(policydb_t * p, cond_node_t * cn)
 			}
 			k = cond_evaluate_expr(p, cn->expr);
 			if (k == -1) {
+#ifndef XEN
 				printf
 				    ("While testing expression, expression result "
 				     "was undefined - this should never happen.\n");
+#endif
 				return -1;
 			}
 			/* set the bit if expression evaluates true */
@@ -639,8 +645,10 @@ static int cond_insertf(avtab_t * a
 	 */
 	if (k->specified & AVTAB_TYPE) {
 		if (avtab_search(&p->te_avtab, k)) {
+#ifndef XEN
 			printf
 			    ("security: type rule already exists outside of a conditional.");
+#endif
 			goto err;
 		}
 		/*
@@ -656,8 +664,10 @@ static int cond_insertf(avtab_t * a
 			if (node_ptr) {
 				if (avtab_search_node_next
 				    (node_ptr, k->specified)) {
+#ifndef XEN
 					printf
 					    ("security: too many conflicting type rules.");
+#endif
 					goto err;
 				}
 				found = 0;
@@ -668,15 +678,19 @@ static int cond_insertf(avtab_t * a
 					}
 				}
 				if (!found) {
+#ifndef XEN
 					printf
 					    ("security: conflicting type rules.\n");
+#endif
 					goto err;
 				}
 			}
 		} else {
 			if (avtab_search(&p->te_cond_avtab, k)) {
+#ifndef XEN
 				printf
 				    ("security: conflicting type rules when adding type rule for true.\n");
+#endif
 				goto err;
 			}
 		}
@@ -684,7 +698,9 @@ static int cond_insertf(avtab_t * a
 
 	node_ptr = avtab_insert_nonunique(&p->te_cond_avtab, k, d);
 	if (!node_ptr) {
+#ifndef XEN
 		printf("security: could not insert rule.");
+#endif
 		goto err;
 	}
 	node_ptr->parse_context = (void *)1;
@@ -747,14 +763,18 @@ static int cond_read_av_list(policydb_t * p, void *fp,
 static int expr_isvalid(policydb_t * p, cond_expr_t * expr)
 {
 	if (expr->expr_type <= 0 || expr->expr_type > COND_LAST) {
+#ifndef XEN
 		printf
 		    ("security: conditional expressions uses unknown operator.\n");
+#endif
 		return 0;
 	}
 
 	if (expr->bool > p->p_bools.nprim) {
+#ifndef XEN
 		printf
 		    ("security: conditional expressions uses unknown bool.\n");
+#endif
 		return 0;
 	}
 	return 1;

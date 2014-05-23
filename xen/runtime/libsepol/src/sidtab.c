@@ -279,9 +279,11 @@ void sepol_sidtab_hash_eval(sidtab_t * h, char *tag)
 		}
 	}
 
+#ifndef XEN
 	printf
 	    ("%s:  %d entries and %d/%d buckets used, longest chain length %d\n",
 	     tag, h->nel, slots_used, SIDTAB_SIZE, max_chain_len);
+#endif
 }
 
 void sepol_sidtab_destroy(sidtab_t * s)

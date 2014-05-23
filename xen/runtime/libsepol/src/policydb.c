@@ -1532,7 +1532,9 @@ int symtab_insert(policydb_t * pol, uint32_t sym,
 			base_role = (role_datum_t *)
 					hashtab_search(pol->symtab[sym].table,
 						       key);
+#ifndef XEN
 			assert(base_role != NULL);
+#endif
 
 			if (!((base_role->flavor == ROLE_ROLE) &&
 			    (cur_role->flavor == ROLE_ROLE))) {
@@ -3458,7 +3460,9 @@ static int avrule_block_read(policydb_t * p,
 	uint32_t buf[1], num_blocks, nel;
 	int rc;
 
+#ifndef XEN
 	assert(*block == NULL);
+#endif
 
 	rc = next_entry(buf, fp, sizeof(uint32_t));
 	if (rc < 0)
@@ -3506,7 +3510,9 @@ static int avrule_block_read(policydb_t * p,
 			if (curblock->branch_list == NULL) {
 				curblock->branch_list = curdecl;
 			} else {
+#ifndef XEN
 				assert(last_decl);
+#endif
 				last_decl->next = curdecl;
 			}
 			last_decl = curdecl;
@@ -3516,7 +3522,9 @@ static int avrule_block_read(policydb_t * p,
 		if (*block == NULL) {
 			*block = curblock;
 		} else {
+#ifndef XEN
 			assert(last_block);
+#endif
 			last_block->next = curblock;
 		}
 		last_block = curblock;
@@ -3562,7 +3570,9 @@ static int scope_read(policydb_t * p, int symnum, struct policy_file *fp)
 		goto cleanup;
 	scope->scope = le32_to_cpu(buf[0]);
 	scope->decl_ids_len = le32_to_cpu(buf[1]);
+#ifndef XEN
 	assert(scope->decl_ids_len > 0);
+#endif
 	if ((scope->decl_ids =
 	     malloc(scope->decl_ids_len * sizeof(uint32_t))) == NULL) {
 		goto cleanup;
@@ -3718,7 +3728,9 @@ int policydb_read(policydb_t * p, struct policy_file *fp, unsigned verbose)
 			return POLICYDB_ERROR;
 		}
 	} else {
+#ifndef XEN
 		assert(0);
+#endif
 	}
 	bufindex++;
 
